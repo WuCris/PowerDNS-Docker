@@ -10,8 +10,9 @@ services:
       MARIADB_USER:
       MARIADB_PASSWORD:
       MARIADB_DATABASE:
-    #depends_on:
-    #  - mariadb-master
+    depends_on:
+      mariadb-master:
+        condition: service_healthy
 
   powerdnsadmin:
     image: powerdnsadmin/pda-legacy:latest
@@ -28,13 +29,15 @@ services:
       - GUNICORN_WORKERS=2
       - GUNICORN_LOGLEVEL=DEBUG
       - SECRET_KEY=t2KE6RbdTwCLPL0bConFJzKwwGNX4ezcALwdAiF9W4uiTRRk9xyC5ZIQNrKYTUGHcWzr90
+    depends_on:
+      - mariadb-master
+      - powerdns
 
   mariadb-master:
     image: mariadb-powerdns:latest
     build: mariadb
     command: --server_id=1 --log-bin --log-basename=master1 --binlog-format=mixed
     environment:
-     #MARIADB_RANDOM_ROOT_PASSWORD: yes
       MARIADB_ROOT_PASSWORD:
       MARIADB_USER:
       MARIADB_PASSWORD:
