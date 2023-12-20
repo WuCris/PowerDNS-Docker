@@ -1,1 +1,2 @@
-mariadb -u"$MARIADB_USER" -p"$MARIADB_PASSWORD" "$MARIADB_DATABASE" < /etc/default/template/create_db.sql
+set -e
+mariadb -u root -p"$MARIADB_ROOT_PASSWORD" < /etc/default/template/create_db.sql

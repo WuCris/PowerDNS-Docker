@@ -2,7 +2,7 @@ version: "3"
 
 services:
   powerdns:
-    image: powerdns:4.8-alpine
+    image: powerdns:4.8.3-alpine-3.19
     hostname: powerdns
     build: powerdns
     #environment:
@@ -19,17 +19,19 @@ services:
       options:
         max-size: 50m
     environment:
-      - SQLALCHEMY_DATABASE_URI=mysql://pda:changeme@host.docker.internal/pda
+      - SQLALCHEMY_DATABASE_URI=mysql://powerdns:powerdnspassword@mariadb-master/powerdns
       - GUNICORN_TIMEOUT=60
       - GUNICORN_WORKERS=2
       - GUNICORN_LOGLEVEL=DEBUG
+      - SECRET_KEY=t2KE6RbdTwCLPL0bConFJzKwwGNX4ezcALwdAiF9W4uiTRRk9xyC5ZIQNrKYTUGHcWzr90
 
   mariadb-master:
     image: mariadb-powerdns:latest
     build: mariadb
     command: --server_id=1 --log-bin --log-basename=master1 --binlog-format=mixed
     environment:
-      MARIADB_RANDOM_ROOT_PASSWORD: yes
+     #MARIADB_RANDOM_ROOT_PASSWORD: yes
+      MARIADB_ROOT_PASSWORD:
       MARIADB_USER: powerdns
       MARIADB_PASSWORD: powerdnspassword
       MARIADB_DATABASE: powerdns
