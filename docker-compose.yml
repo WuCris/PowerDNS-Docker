@@ -2,7 +2,7 @@ version: "3"
 
 services:
   powerdns:
-    image: powerdns:4.8
+    image: powerdns:4.8-alpine
     hostname: powerdns
     build: powerdns
     #environment:
