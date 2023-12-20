@@ -1,9 +1,8 @@
 version: "3"
 
 services:
-  powerdns:
+  powerdns-master:
     image: powerdns:4.8.3-alpine-3.19
-    hostname: powerdns
     build: powerdns
     environment:
       MARIADB_HOST: mariadb-master
@@ -13,6 +12,19 @@ services:
       API_KEY:
     depends_on:
       mariadb-master:
+        condition: service_healthy
+
+  powerdns-slave:
+    image: powerdns:4.8.3-alpine-3.19
+    build: powerdns
+    environment:
+      MARIADB_HOST: mariadb-slave
+      MARIADB_USER:
+      MARIADB_PASSWORD:
+      MARIADB_DATABASE:
+      API_KEY:
+    depends_on:
+      mariadb-slave:
         condition: service_healthy
 
   powerdnsadmin:
@@ -32,10 +44,10 @@ services:
       - SECRET_KEY=t2KE6RbdTwCLPL0bConFJzKwwGNX4ezcALwdAiF9W4uiTRRk9xyC5ZIQNrKYTUGHcWzr90
     depends_on:
       - mariadb-master
-      - powerdns
+      - powerdns-master
 
   mariadb-master:
-    image: mariadb-powerdns:latest
+    image: mariadb-powerdns:11.2
     build: mariadb
     command: --server_id=1 --log-bin --log-basename=master1 --binlog-format=mixed
     environment:
@@ -43,8 +55,8 @@ services:
       MARIADB_USER:
       MARIADB_PASSWORD:
       MARIADB_DATABASE:
-      MARIADB_REPLICATION_USER: pds_replication
-      MARIADB_REPLICATION_PASSWORD: pds_replication_pass
+      MARIADB_REPLICATION_USER: pdns_replication
+      MARIADB_REPLICATION_PASSWORD: pdns_replication_pass
     healthcheck:
       test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
       interval: 10s
@@ -53,5 +65,26 @@ services:
     volumes:
       - mariadb-master:/var/lib/mysql
 
+  mariadb-slave:
+    image: mariadb:11.2
+    command: --server-id=2 --log-basename=master1 --binlog-format=mixed --read-only
+    environment:
+      MARIADB_RANDOM_ROOT_PASSWORD: yes
+      MARIADB_MASTER_HOST: mariadb-master
+      MARIADB_REPLICATION_USER: pdns_replication
+      MARIADB_REPLICATION_PASSWORD: pdns_replication_pass
+      MARIADB_HEALTHCHECK_GRANTS: REPLICA MONITOR
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--replication_io", "--replication_sql", "--replication_seconds_behind_master=1", "--replication"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    depends_on:
+      mariadb-master:
+        condition: service_healthy
+    volumes:
+      - mariadb-slave:/var/lib/mysql
+
 volumes:
     mariadb-master:
+    mariadb-slave:
