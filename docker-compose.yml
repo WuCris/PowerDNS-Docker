@@ -5,7 +5,11 @@ services:
     image: powerdns:4.8.3-alpine-3.19
     hostname: powerdns
     build: powerdns
-    #environment:
+    environment:
+      MARIADB_HOST: mariadb-master
+      MARIADB_USER:
+      MARIADB_PASSWORD:
+      MARIADB_DATABASE:
     #depends_on:
     #  - mariadb-master
 
@@ -32,9 +36,9 @@ services:
     environment:
      #MARIADB_RANDOM_ROOT_PASSWORD: yes
       MARIADB_ROOT_PASSWORD:
-      MARIADB_USER: powerdns
-      MARIADB_PASSWORD: powerdnspassword
-      MARIADB_DATABASE: powerdns
+      MARIADB_USER:
+      MARIADB_PASSWORD:
+      MARIADB_DATABASE:
       MARIADB_REPLICATION_USER: pds_replication
       MARIADB_REPLICATION_PASSWORD: pds_replication_pass
     healthcheck:
