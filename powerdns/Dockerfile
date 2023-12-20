@@ -10,6 +10,7 @@ COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod 555 /docker-entrypoint.sh
 
 EXPOSE 8081
+EXPOSE 53/tcp 53/udp
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["pdns_server"]
