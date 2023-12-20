@@ -1,3 +1,5 @@
+--contents from /usr/share/pdns-backend-mysql/schema/schema.mysql.sql on Ubuntu installation and offical repo--
+
 CREATE TABLE domains (
   id                    INT AUTO_INCREMENT,
   name                  VARCHAR(255) NOT NULL,
