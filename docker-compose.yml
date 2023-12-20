@@ -10,6 +10,7 @@ services:
       MARIADB_USER:
       MARIADB_PASSWORD:
       MARIADB_DATABASE:
+      API_KEY:
     depends_on:
       mariadb-master:
         condition: service_healthy
